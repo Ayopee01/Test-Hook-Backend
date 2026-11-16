@@ -1,0 +1,29 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// event ที่ test-hook ได้รับ (หนึ่งแถวต่อ event, request ที่ไม่มี event เก็บหนึ่งแถวที่ event_type เป็น null)
+model ReceivedEvent {
+  id             Int      @id @default(autoincrement())
+  requestId      String   @map("request_id")
+  signatureValid Boolean  @map("signature_valid")
+  destination    String?
+  webhookEventId String?  @map("webhook_event_id")
+  lineUserId     String?  @map("line_user_id")
+  eventType      String?  @map("event_type")
+  messageType    String?  @map("message_type")
+  content        String?
+  payload        Json?
+  responseStatus Int      @map("response_status")
+  error          String?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@index([eventType, createdAt])
+  @@index([lineUserId, createdAt])
+  @@map("received_events")
+}

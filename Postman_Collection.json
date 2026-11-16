@@ -1,0 +1,219 @@
+{
+  "info": {
+    "name": "Test-Hook-Backend",
+    "description": "ดู event ที่ Test-Hook-Backend ได้รับจาก center-hook (แทน Frontend)\n\nแก้ตัวแปร `base_url` ของ collection (แท็บ Variables) เป็น URL ของ server ก่อนยิง เช่น `https://<your-server>` หรือ `http://localhost:4002`",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://test-hook-backend.onrender.com",
+      "type": "string"
+    },
+    {
+      "key": "event_id",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "List events",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// เก็บ id ของรายการแรกไว้ใช้กับ Get event by id",
+                  "const first = pm.response.json().data?.[0];",
+                  "if (first) pm.collectionVariables.set(\"event_id\", String(first.id));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/events?page=1&limit=20",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "events"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "สูงสุด 100"
+                },
+                {
+                  "key": "event_type",
+                  "value": "message",
+                  "description": "message, postback, follow, unfollow, ...",
+                  "disabled": true
+                },
+                {
+                  "key": "line_user_id",
+                  "value": "U1234567890abcdef",
+                  "disabled": true
+                },
+                {
+                  "key": "signature_valid",
+                  "value": "true",
+                  "description": "true / false",
+                  "disabled": true
+                },
+                {
+                  "key": "has_error",
+                  "value": "true",
+                  "description": "true / false",
+                  "disabled": true
+                },
+                {
+                  "key": "from",
+                  "value": "2026-11-16",
+                  "description": "ISO date/datetime",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2026-11-17",
+                  "description": "ISO date/datetime",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "รายการ event เรียงจากใหม่ไปเก่า ติ๊ก query ที่ปิดไว้เพื่อกรองเพิ่ม"
+          }
+        },
+        {
+          "name": "List events error",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/events?has_error=true",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "events"
+              ],
+              "query": [
+                {
+                  "key": "has_error",
+                  "value": "true"
+                }
+              ]
+            },
+            "description": "ดูสาเหตุใน field `error`: LINE_CHANNEL_SECRET_NOT_CONFIGURED, MISSING_SIGNATURE, INVALID_SIGNATURE, INVALID_JSON"
+          }
+        },
+        {
+          "name": "List message events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/events?event_type=message",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "events"
+              ],
+              "query": [
+                {
+                  "key": "event_type",
+                  "value": "message"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List postback events",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/events?event_type=postback",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "events"
+              ],
+              "query": [
+                {
+                  "key": "event_type",
+                  "value": "postback"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get event by id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/events/{{event_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "events",
+                "{{event_id}}"
+              ]
+            },
+            "description": "`event_id` ถูกตั้งอัตโนมัติจากรายการแรกของ List events (ล่าสุด)"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                ""
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
